@@ -18,7 +18,7 @@ class _PinPageState extends State<PinPage> {
       });
     }
 
-    if (pinController.text == '140220') {
+    if (pinController.text == '123456') {
       Navigator.pop(context, true);
     }
   }
