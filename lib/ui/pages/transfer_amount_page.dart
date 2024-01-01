@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class TopupAmountPage extends StatefulWidget {
-  const TopupAmountPage({super.key});
+class TransferAmountPage extends StatefulWidget {
+  const TransferAmountPage({super.key});
 
   @override
-  State<TopupAmountPage> createState() => _TopupAmountPageState();
+  State<TransferAmountPage> createState() => _TransferAmountPageState();
 }
 
-class _TopupAmountPageState extends State<TopupAmountPage> {
+class _TransferAmountPageState extends State<TransferAmountPage> {
   final TextEditingController amountController =
       TextEditingController(text: '0');
 
@@ -67,7 +67,7 @@ class _TopupAmountPageState extends State<TopupAmountPage> {
       body: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 100),
           children: [
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Center(
@@ -197,18 +197,12 @@ class _TopupAmountPageState extends State<TopupAmountPage> {
               height: 50,
             ),
             CustomFilledButton(
-                title: 'Gass Topup',
+                title: 'Gass Transfer',
                 width: 170,
                 onPressed: () async {
                   if (await Navigator.pushNamed(context, '/pin') == true) {
-                    final Uri url = Uri.parse('https://demo.midtrans.com/');
-                    await launchUrl(url);
-                    if (!await launchUrl(url)) {
-                      throw Exception('Could not launch $url');
-                    }
-
                     Navigator.pushNamedAndRemoveUntil(
-                        context, '/topup-success', (route) => false);
+                        context, '/transfer-success', (route) => false);
                   }
                 }),
             const SizedBox(
