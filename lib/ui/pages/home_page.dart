@@ -1,3 +1,4 @@
+import 'package:bwa/shared/shared_methods.dart';
 import 'package:bwa/shared/theme.dart';
 import 'package:bwa/ui/widgets/home_latest_transaction_item.dart';
 import 'package:bwa/ui/widgets/home_service_item.dart';
@@ -92,7 +93,7 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Howdy',
+                'Halo',
                 style: greyTextStyle.copyWith(fontSize: 16),
               ),
               const SizedBox(
@@ -171,7 +172,7 @@ class HomePage extends StatelessWidget {
             height: 17,
           ),
           Text('Balance', style: whiteTextStyle),
-          Text('Rp. 12.000',
+          Text(formatCurrency(20000000, symbol: 'Rp. '),
               style:
                   whiteTextStyle.copyWith(fontSize: 24, fontWeight: semiBold)),
         ],
@@ -203,7 +204,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               Text(
-                'of Rp.20.000',
+                'of ${formatCurrency(200000, symbol: 'Rp. ')}',
                 style: blackTextStyle.copyWith(
                   fontWeight: semiBold,
                 ),
@@ -265,7 +266,11 @@ class HomePage extends StatelessWidget {
               HomeServiceItem(
                 iconUrl: 'assets/ic_topup.png',
                 title: 'More',
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const MoreDialog());
+                },
               ),
             ],
           )
@@ -289,29 +294,29 @@ class HomePage extends StatelessWidget {
             margin: const EdgeInsets.only(top: 14),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20), color: whiteColor),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 HomeLatestTransactionItem(
                     iconUrl: 'assets/ic_transaction_cat1.png',
                     title: 'Topup',
                     time: 'Yesterday',
-                    value: '+ 450.000'),
+                    value: '- ${formatCurrency(200000, symbol: '')}'),
                 HomeLatestTransactionItem(
                     iconUrl: 'assets/ic_transaction_cat2.png',
                     title: 'Cashback',
                     time: 'Sep 11',
-                    value: '+ 22.000'),
+                    value: '+ ${formatCurrency(251000, symbol: '')}'),
                 HomeLatestTransactionItem(
                     iconUrl: 'assets/ic_transaction_cat3.png',
                     title: 'Withdraw',
                     time: 'Sep 2',
-                    value: '- 5.000'),
+                    value: '- ${formatCurrency(220000, symbol: '')}'),
                 HomeLatestTransactionItem(
                     iconUrl: 'assets/ic_transaction_cat4.png',
                     title: 'Transfer',
                     time: 'Feb 18',
-                    value: '- 12.300.000'),
+                    value: '+ ${formatCurrency(52000, symbol: '')}'),
               ],
             ),
           ),
@@ -384,6 +389,72 @@ class HomePage extends StatelessWidget {
                 url: 'www.google.com'),
           ])
         ],
+      ),
+    );
+  }
+}
+
+class MoreDialog extends StatelessWidget {
+  const MoreDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.zero,
+      alignment: Alignment.bottomCenter,
+      content: Container(
+        padding: const EdgeInsets.all(30),
+        height: 350,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(40), color: lightBgColor),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'More',
+              style:
+                  blackTextStyle.copyWith(fontSize: 16, fontWeight: semiBold),
+            ),
+            SizedBox(
+              height: 13,
+            ),
+            Wrap(
+              spacing: 30,
+              runSpacing: 30,
+              children: [
+                HomeServiceItem(
+                  iconUrl: 'assets/ic_data.png',
+                  title: 'Data',
+                  onTap: () {
+                    Navigator.pushNamed(context, '/data-provider');
+                  },
+                ),
+                HomeServiceItem(
+                  iconUrl: 'assets/ic_upload.png',
+                  title: 'Topup',
+                  onTap: () {},
+                ),
+                HomeServiceItem(
+                  iconUrl: 'assets/ic_wallet.png',
+                  title: 'Wallet',
+                  onTap: () {},
+                ),
+                HomeServiceItem(
+                  iconUrl: 'assets/ic_stream.png',
+                  title: 'Stream',
+                  onTap: () {},
+                ),
+                HomeServiceItem(
+                  iconUrl: 'assets/ic_water.png',
+                  title: 'Water',
+                  onTap: () {},
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
