@@ -1,4 +1,5 @@
 import 'package:bwa/core.dart';
+import 'package:bwa/shared/shared_methods.dart';
 import 'package:flutter/material.dart';
 
 class PinPage extends StatefulWidget {
@@ -18,8 +19,12 @@ class _PinPageState extends State<PinPage> {
       });
     }
 
-    if (pinController.text == '123456') {
-      Navigator.pop(context, true);
+    if (pinController.text.length == 6) {
+      if (pinController.text == '123456') {
+        Navigator.pop(context, true);
+      } else {
+        showCustomSnackBar(context, 'Pin yang anda masukkan salah');
+      }
     }
   }
 

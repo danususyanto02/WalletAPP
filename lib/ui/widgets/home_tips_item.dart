@@ -31,7 +31,7 @@ class HomeTipsItem extends StatelessWidget {
         ),
         child: Column(children: [
           ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             child: Image.asset(
               imageUrl,
               width: 170,
