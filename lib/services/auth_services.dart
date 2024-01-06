@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:bwa/models/signin_form_model.dart';
 import 'package:bwa/models/signup_form_model.dart';
+import 'package:bwa/models/user_edit_form_model.dart';
 import 'package:bwa/models/user_model.dart';
 import 'package:bwa/shared/shared_values.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -65,6 +65,24 @@ class AuthServices {
       } else {
         throw jsonDecode(res.body)['message'];
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/logout'),
+        headers: {'Authorization': await getToken()},
+      );
+      if (res.statusCode == 200) {
+        await clearLocalStorage();
+      } else {
+        throw jsonDecode(res.body)['message'];
+      }
+
+      throw jsonDecode(res.body)['message'];
     } catch (e) {
       rethrow;
     }

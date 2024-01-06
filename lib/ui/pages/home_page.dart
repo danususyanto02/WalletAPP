@@ -1,3 +1,4 @@
+import 'package:bwa/blocs/auth/auth_bloc.dart';
 import 'package:bwa/shared/shared_methods.dart';
 import 'package:bwa/shared/theme.dart';
 import 'package:bwa/ui/widgets/home_latest_transaction_item.dart';
@@ -5,6 +6,7 @@ import 'package:bwa/ui/widgets/home_service_item.dart';
 import 'package:bwa/ui/widgets/home_tips_item.dart';
 import 'package:bwa/ui/widgets/home_user_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -83,100 +85,123 @@ class HomePage extends StatelessWidget {
     );
   }
 
+//  ,
   Widget buildProfile(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Halo',
-                style: greyTextStyle.copyWith(fontSize: 16),
-              ),
-              const SizedBox(
-                height: 2,
-              ),
-              Text(
-                'Freyanashifa',
-                style:
-                    blackTextStyle.copyWith(fontWeight: semiBold, fontSize: 20),
-              ),
-            ],
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, '/profile');
-            },
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage('assets/img_profile.png'),
-                ),
-              ),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  width: 16,
-                  height: 16,
-                  decoration:
-                      BoxDecoration(shape: BoxShape.circle, color: whiteColor),
-                  child: Center(
-                    child: Icon(
-                      Icons.check_circle,
-                      color: greenColor,
-                      size: 14,
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthSuccess) {
+          return Container(
+            margin: const EdgeInsets.only(top: 40),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Halo',
+                      style: greyTextStyle.copyWith(fontSize: 16),
                     ),
+                    const SizedBox(
+                      height: 2,
+                    ),
+                    Text(
+                      state.user.name.toString(),
+                      style: blackTextStyle.copyWith(
+                          fontWeight: semiBold, fontSize: 20),
+                    ),
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/profile');
+                  },
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: state.user.profilPicture == null
+                            ? const AssetImage('assets/img_profile.png')
+                            : NetworkImage(
+                                state.user.profilPicture!,
+                              ) as ImageProvider,
+                      ),
+                    ),
+                    child: state.user.verified! == 0
+                        ? Container()
+                        : Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle, color: whiteColor),
+                              child: Center(
+                                child: Icon(
+                                  Icons.check_circle,
+                                  color: greenColor,
+                                  size: 14,
+                                ),
+                              ),
+                            ),
+                          ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        }
+        return Container();
+      },
     );
   }
 
   Widget buildWalletCard() {
-    return Container(
-      width: double.infinity,
-      height: 220,
-      margin: const EdgeInsets.only(top: 30),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        image: const DecorationImage(
-            image: AssetImage('assets/img_bg_card.png'), fit: BoxFit.cover),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Freyanashifa',
-            style: whiteTextStyle.copyWith(fontSize: 18, fontWeight: medium),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          Text(
-            '**** **** **** 1280',
-            style: whiteTextStyle.copyWith(
-                fontSize: 18, fontWeight: medium, letterSpacing: 7),
-          ),
-          const SizedBox(
-            height: 17,
-          ),
-          Text('Balance', style: whiteTextStyle),
-          Text(formatCurrency(20000000, symbol: 'Rp. '),
-              style:
-                  whiteTextStyle.copyWith(fontSize: 24, fontWeight: semiBold)),
-        ],
-      ),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthSuccess) {
+          return Container(
+            width: double.infinity,
+            height: 220,
+            margin: const EdgeInsets.only(top: 30),
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              image: const DecorationImage(
+                  image: AssetImage('assets/img_bg_card.png'),
+                  fit: BoxFit.cover),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  state.user.name.toString(),
+                  style:
+                      whiteTextStyle.copyWith(fontSize: 18, fontWeight: medium),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                Text(
+                  '**** **** **** ${state.user.cardNumber!.substring(12, 16)}',
+                  style: whiteTextStyle.copyWith(
+                      fontSize: 18, fontWeight: medium, letterSpacing: 7),
+                ),
+                const SizedBox(
+                  height: 17,
+                ),
+                Text('Balance', style: whiteTextStyle),
+                Text(formatCurrency(state.user.balance ?? 0, symbol: 'Rp. '),
+                    style: whiteTextStyle.copyWith(
+                        fontSize: 24, fontWeight: semiBold)),
+              ],
+            ),
+          );
+        }
+        return Container();
+      },
     );
   }
 

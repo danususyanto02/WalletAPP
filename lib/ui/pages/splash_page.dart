@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bwa/blocs/auth/auth_bloc.dart';
 import 'package:bwa/shared/theme.dart';
 import 'package:flutter/material.dart';
