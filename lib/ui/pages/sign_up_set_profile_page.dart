@@ -1,10 +1,35 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:bwa/models/signup_form_model.dart';
+import 'package:bwa/shared/shared_methods.dart';
 import 'package:bwa/shared/theme.dart';
+import 'package:bwa/ui/pages/sign_up_set_ktp_page.dart';
 import 'package:bwa/ui/widgets/buttons.dart';
 import 'package:bwa/ui/widgets/forms.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-class SignUpSetProfile extends StatelessWidget {
-  const SignUpSetProfile({super.key});
+class SignUpSetProfile extends StatefulWidget {
+  final SignUpFormModel data;
+
+  const SignUpSetProfile({Key? key, required this.data}) : super(key: key);
+
+  @override
+  State<SignUpSetProfile> createState() => _SignUpSetProfileState();
+}
+
+class _SignUpSetProfileState extends State<SignUpSetProfile> {
+  final pinController = TextEditingController(text: '');
+  XFile? selectedImage;
+
+  bool validate() {
+    if (pinController.text.length != 6) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +65,35 @@ class SignUpSetProfile extends StatelessWidget {
               children: [
                 //NOTE: EMAIL INPUT
 
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                      image: const DecorationImage(
-                          image: AssetImage('assets/img_profile.png'),
-                          fit: BoxFit.cover),
+                GestureDetector(
+                  onTap: () async {
+                    final image = await selectImage();
+                    setState(() {
+                      selectedImage = image;
+                    });
+                  },
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: lightBgColor),
+                      color: lightBgColor,
+                      image: selectedImage == null
+                          ? null
+                          : DecorationImage(
+                              image: FileImage(
+                                File(selectedImage!.path),
+                              ),
+                            ),
+                    ),
+                    child: selectedImage != null
+                        ? null
+                        : Center(
+                            child: Image.asset(
+                            'assets/ic_upload.png',
+                            width: 35,
+                          )),
+                  ),
                 ),
 
                 const SizedBox(
@@ -63,7 +108,12 @@ class SignUpSetProfile extends StatelessWidget {
                   height: 30,
                 ),
 
-                const CustomFormField(title: ('Set PIN (6) Digit Number')),
+                CustomFormField(
+                  title: ('Set PIN (6) Digit Number'),
+                  controller: pinController,
+                  obscureText: true,
+                  keyboardType: TextInputType.number,
+                ),
 
                 const SizedBox(
                   height: 50,
@@ -72,7 +122,27 @@ class SignUpSetProfile extends StatelessWidget {
                 CustomFilledButton(
                     title: 'Continue',
                     onPressed: () {
-                      Navigator.pushNamed(context, '/sign-up-set-ktp');
+                      if (validate()) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpSetKtpPage(
+                              data: widget.data.copyWith(
+                                pin: pinController.text,
+                                profilePicture: selectedImage == null
+                                    ? null
+                                    : "data:image/jpeg;base64," +
+                                        base64Encode(
+                                          File(selectedImage!.path)
+                                              .readAsBytesSync(),
+                                        ),
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        showCustomSnackBar(context, 'Pin Harus 6 Digit');
+                      }
                     }),
               ],
             ),
