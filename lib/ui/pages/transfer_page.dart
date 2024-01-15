@@ -1,11 +1,31 @@
+import 'package:bwa/blocs/user/user_bloc.dart';
 import 'package:bwa/core.dart';
+import 'package:bwa/models/transfer_form_model.dart';
+import 'package:bwa/models/user_model.dart';
+import 'package:bwa/ui/pages/transfer_amount_page.dart';
 import 'package:bwa/ui/widgets/forms.dart';
 import 'package:bwa/ui/widgets/transfer_reason_user_item.dart';
 import 'package:bwa/ui/widgets/transfer_result_user_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TransferPage extends StatelessWidget {
+class TransferPage extends StatefulWidget {
   const TransferPage({super.key});
+
+  @override
+  State<TransferPage> createState() => _TransferPageState();
+}
+
+class _TransferPageState extends State<TransferPage> {
+  final usernameController = TextEditingController(text: '');
+  UserModel? selectedUser;
+  late UserBloc userBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    userBloc = context.read<UserBloc>()..add(UserGetRecent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,23 +48,88 @@ class TransferPage extends StatelessWidget {
           const SizedBox(
             height: 14,
           ),
-          const CustomFormField(
+          CustomFormField(
             title: 'Username',
             isShowTitle: false,
+            controller: usernameController,
+            onFieldSubmitted: (value) {
+              if (value.isNotEmpty) {
+                userBloc.add(UserGetByUsername(usernameController.text));
+              } else {
+                userBloc.add(UserGetRecent());
+              }
+            },
           ),
-          buildResultUsers(),
+          // ,
+          usernameController.text.isEmpty
+              ? buildRecentUsers()
+              : buildResultUsers(),
           const SizedBox(
             height: 100,
-          ),
-          CustomFilledButton(
-            title: 'Continue',
-            onPressed: () {
-              Navigator.pushNamed(context, '/transfer-amount');
-            },
           ),
           const SizedBox(
             height: 50,
           ),
+        ],
+      ),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.all(24),
+        child: CustomFilledButton(
+          title: 'Continue',
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => TransferAmountPage(
+                        data: TransferFormModel(
+                            sendTo: selectedUser!.username!))));
+          },
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  Widget buildResultUsers() {
+    return Container(
+      margin: const EdgeInsets.only(top: 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Result',
+            style: blackTextStyle.copyWith(fontSize: 16, fontWeight: semiBold),
+          ),
+          const SizedBox(
+            height: 14,
+          ),
+          Center(
+            child: BlocBuilder<UserBloc, UserState>(
+              builder: (context, state) {
+                if (state is UserSuccess) {
+                  return Wrap(
+                    runSpacing: 16,
+                    spacing: 30,
+                    children: state.users.map((user) {
+                      return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedUser = user;
+                            });
+                          },
+                          child: TransferResultUserItem(
+                            user: user,
+                            isSelected: user.id == selectedUser?.id,
+                          ));
+                    }).toList(),
+                  );
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+          )
         ],
       ),
     );
@@ -64,62 +149,28 @@ Widget buildRecentUsers() {
         const SizedBox(
           height: 14,
         ),
-        const TransferReasonUserItem(
-            imageUrl: 'assets/img_friend1.png',
-            name: 'Yonna',
-            username: 'Yonaan2',
-            isVerified: true),
-        const TransferReasonUserItem(
-            imageUrl: 'assets/img_friend2.png',
-            name: 'Jayawardana',
-            username: 'jaya23',
-            isVerified: true),
-        const TransferReasonUserItem(
-            imageUrl: 'assets/img_friend3.png',
-            name: 'Freya',
-            username: 'Frey22',
-            isVerified: false),
-      ],
-    ),
-  );
-}
-
-Widget buildResultUsers() {
-  return Container(
-    margin: const EdgeInsets.only(top: 40),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Result',
-          style: blackTextStyle.copyWith(fontSize: 16, fontWeight: semiBold),
-        ),
-        const SizedBox(
-          height: 14,
-        ),
-        const Center(
-          child: Wrap(
-            runSpacing: 16,
-            spacing: 30,
-            children: [
-              TransferResultUserItem(
-                  imageUrl: 'assets/img_friend1.png',
-                  name: 'Yonna',
-                  username: 'Yonaan2',
-                  isVerified: true),
-              TransferResultUserItem(
-                  imageUrl: 'assets/img_friend2.png',
-                  name: 'Wardana',
-                  username: 'jaya23',
-                  isVerified: true),
-              TransferResultUserItem(
-                  imageUrl: 'assets/img_friend3.png',
-                  name: 'Freya',
-                  username: 'Frey22',
-                  isSelected: true,
-                  isVerified: false),
-            ],
-          ),
+        BlocBuilder<UserBloc, UserState>(
+          builder: (context, state) {
+            if (state is UserSuccess) {
+              return Column(
+                children: state.users.map((user) {
+                  return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TransferAmountPage(
+                                    data: TransferFormModel(
+                                        sendTo: user.username!))));
+                      },
+                      child: TransferReasonUserItem(user: user));
+                }).toList(),
+              );
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
         )
       ],
     ),
