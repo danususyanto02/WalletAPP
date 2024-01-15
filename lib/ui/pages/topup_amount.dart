@@ -97,7 +97,7 @@ class _TopupAmountPageState extends State<TopupAmountPage> {
             return ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 100),
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 40,
                   ),
                   Center(

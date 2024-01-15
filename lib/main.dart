@@ -1,4 +1,5 @@
 import 'package:bwa/blocs/auth/auth_bloc.dart';
+import 'package:bwa/blocs/user/user_bloc.dart';
 import 'package:bwa/core.dart';
 import 'package:bwa/ui/pages/data_package_page.dart';
 import 'package:bwa/ui/pages/data_provider_page.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(
             create: (context) => AuthBloc()..add(AuthGetCurrentUser())),
+        BlocProvider(create: (context) => UserBloc()),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -60,7 +62,6 @@ class MyApp extends StatelessWidget {
           '/topup': (context) => const TopupPage(),
           '/topup-success': (context) => const TopupSuccessPage(),
           '/transfer': (context) => const TransferPage(),
-          '/transfer-amount': (context) => const TransferAmountPage(),
           '/transfer-success': (context) => const TransferSuccessPage(),
           '/data-provider': (context) => const DataProviderPage(),
           '/data-package': (context) => const DataPackagePage(),
